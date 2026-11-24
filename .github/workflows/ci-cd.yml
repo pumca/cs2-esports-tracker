@@ -1,0 +1,92 @@
+name: CI/CD
+
+# Minden push / pull request elindítja a pipeline-t: build -> teszt -> image -> deploy (sandbox) -> smoke teszt
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE: ghcr.io/${{ github.repository }}
+
+jobs:
+  build-test:
+    name: Build és teszt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Szintaxis ellenőrzés (lint)
+        run: npm run lint
+      - name: Unit és API tesztek
+        run: npm test
+
+  docker:
+    name: Docker image build és publikálás
+    needs: build-test
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Image név kisbetűsítése
+        run: echo "IMAGE_LC=${IMAGE,,}" >> "$GITHUB_ENV"
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          build-args: APP_VERSION=${{ github.sha }}
+          tags: |
+            ${{ env.IMAGE_LC }}:latest
+            ${{ env.IMAGE_LC }}:${{ github.sha }}
+
+  deploy:
+    name: Deploy sandbox környezetbe és smoke teszt
+    needs: docker
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
+    steps:
+      - name: Image név kisbetűsítése
+        run: echo "IMAGE_LC=${IMAGE,,}" >> "$GITHUB_ENV"
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Telepítés (a lefuttatott artifact a registry-ből jön)
+        run: |
+          docker pull "$IMAGE_LC:${{ github.sha }}"
+          docker run -d --name tracker -p 3000:3000 "$IMAGE_LC:${{ github.sha }}"
+      - name: Várakozás az indulásra
+        run: |
+          for i in $(seq 1 20); do
+            curl -fsS http://localhost:3000/health && exit 0
+            sleep 2
+          done
+          docker logs tracker
+          exit 1
+      - name: Smoke teszt – az üzleti funkciók elérhetők
+        run: |
+          curl -fsS http://localhost:3000/health | grep '"status":"ok"'
+          curl -fsS http://localhost:3000/health | grep "${{ github.sha }}"
+          curl -fsS http://localhost:3000/api/standings | grep 'NAVI'
+          curl -fsS -X POST http://localhost:3000/api/teams \
+            -H 'content-type: application/json' -d '{"name":"Smoke Team","country":"HU"}' | grep 'Smoke Team'
+          curl -fsS http://localhost:3000/ | grep 'CS2'
+      - name: Összefoglaló
+        run: echo "Sikeres deploy: $IMAGE_LC:${{ github.sha }}" >> "$GITHUB_STEP_SUMMARY"

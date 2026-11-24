@@ -1,0 +1,44 @@
+'use strict';
+const path = require('path');
+const express = require('express');
+const { createStore } = require('./store');
+
+function createApp(store = createStore()) {
+  const app = express();
+  app.use(express.json());
+  app.use(express.static(path.join(__dirname, '..', 'public')));
+
+  app.get('/health', (req, res) => res.json({
+    status: 'ok',
+    version: process.env.APP_VERSION || 'dev',
+    uptime: Math.round(process.uptime()),
+  }));
+
+  app.get('/api/teams', (req, res) => res.json(store.teams));
+  app.post('/api/teams', (req, res) => {
+    try { res.status(201).json(store.addTeam(req.body || {})); }
+    catch (e) { res.status(400).json({ error: e.message }); }
+  });
+
+  app.get('/api/matches', (req, res) => res.json(store.matches));
+  app.post('/api/matches', (req, res) => {
+    try { res.status(201).json(store.addMatch(req.body || {})); }
+    catch (e) { res.status(400).json({ error: e.message }); }
+  });
+
+  app.delete('/api/teams/:id', (req, res) => {
+    try { store.deleteTeam(Number(req.params.id)); res.status(204).end(); }
+    catch (e) { res.status(400).json({ error: e.message }); }
+  });
+  app.delete('/api/matches/:id', (req, res) => {
+    try { store.deleteMatch(Number(req.params.id)); res.status(204).end(); }
+    catch (e) { res.status(400).json({ error: e.message }); }
+  });
+
+  app.get('/api/standings', (req, res) => res.json(store.standings()));
+  app.get('/api/stats', (req, res) => res.json(store.stats()));
+
+  return app;
+}
+
+module.exports = { createApp };
