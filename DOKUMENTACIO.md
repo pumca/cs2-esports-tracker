@@ -30,7 +30,7 @@ Az alkalmazás egy **CS2 (Counter-Strike 2) esport tornakövető**: csapatok és
 Az adattárolás szándékosan memóriabeli, mert a feladat hangsúlya az automatizáláson van.
 
 ## 3. Architektúra és eszközök
-- **Futtatókörnyezet:** Node.js 20 + Express
+- **Futtatókörnyezet:** Node.js 22 LTS + Express
 - **Verziókezelés:** Git + GitHub
 - **CI/CD:** GitHub Actions (a DevOps sandbox)
 - **Csomagolás / artifact:** Docker image, GitHub Container Registry (GHCR)
@@ -45,7 +45,7 @@ git push ─► GitHub ─► Actions pipeline
 
 ## 4. A pipeline lépései (`.github/workflows/ci-cd.yml`)
 1. **Trigger:** push és pull request a `main` ágra, valamint kézi indítás.
-2. **build-test:** checkout, Node 20 telepítés (npm cache), `npm ci` (reprodukálható build), `npm run lint`, `npm test`. Hiba esetén a pipeline megáll, nem készül image.
+2. **build-test:** checkout, Node 22 telepítés (npm cache), `npm ci` (reprodukálható build), `npm run lint`, `npm test`. Hiba esetén a pipeline megáll, nem készül image.
 3. **docker:** Docker Buildx, bejelentkezés a GHCR-be a beépített `GITHUB_TOKEN`-nel, multi-stage build, push két taggel (`latest` és a commit SHA). A SHA a `APP_VERSION` build-argumentumon át bekerül az image-be.
 4. **deploy:** a sandbox (a GitHub runner) a registry-ből **lehúzza a most elkészült artifactot**, elindítja konténerként, majd megvárja a `/health` válaszát.
 5. **Smoke teszt (Definition of Done):** ellenőrzi, hogy az artifact elindult és az üzleti funkciók elérhetők: `/health` ok és a verzió megegyezik a commit SHA-val, a tabella tartalmazza a seed adatokat, új csapat létrehozható, a webes felület kiszolgálódik.
@@ -77,3 +77,10 @@ docker compose up --build # Dockerrel
 
 ## 8. Továbbfejlesztési lehetőségek
 Tartós adatbázis (PostgreSQL), telepítés külső felhőbe (pl. Render/Fly.io/Azure) a deploy jobban, Kubernetes manifest, monitoring (Prometheus), automatikus verziózás (semantic release).
+
+## 9. Élő repository és igazolt futás
+- Repository: https://github.com/pumca/cs2-esports-tracker (privát; az oktató hozzáférését a Settings → Collaborators menüben lehet megadni)
+- Első sikeres pipeline-futás: https://github.com/pumca/cs2-esports-tracker/actions/runs/45477854908
+  - Build és teszt: 16 mp · Docker image build és publikálás: 42 mp · Deploy és smoke teszt: 15 mp · összesen 1 p 20 mp
+  - A deploy job összefoglalója: `Sikeres deploy: ghcr.io/pumca/cs2-esports-tracker:<commit SHA>`
+- A futtatott image a GitHub Container Registry-ben: `ghcr.io/pumca/cs2-esports-tracker` (`latest` és commit SHA tag)
