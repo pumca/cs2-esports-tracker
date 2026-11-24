@@ -80,8 +80,8 @@ Tartós adatbázis (PostgreSQL), telepítés külső felhőbe (pl. Render/Fly.io
 
 ## 9. Élő repository és igazolt futás
 - Repository (nyilvános): https://github.com/pumca/cs2-esports-tracker
-- Igazolt sikeres pipeline-futás: https://github.com/pumca/cs2-esports-tracker/actions/runs/45485436506
-  - Build és teszt → Docker image build és publikálás → Deploy és smoke teszt, mind sikeres, összesen 1 p 16 mp
+- Igazolt sikeres pipeline-futás: https://github.com/pumca/cs2-esports-tracker/actions/runs/45488994014
+  - Build és teszt → Docker image build és publikálás → Deploy és smoke teszt, mind sikeres, összesen 55 mp
   - A smoke teszt kimenete: a `/health` a commit SHA-t adja vissza, a tabella lekérdezhető, új csapat felvehető
 - A futtatott image a GitHub Container Registry-ben: `ghcr.io/pumca/cs2-esports-tracker` (`latest` és commit SHA tag)
 

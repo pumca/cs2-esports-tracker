@@ -48,7 +48,7 @@
     <tr><td>Készítette</td><td><b>NWXGKT</b></td></tr>
     <tr><td>Forráskód (Git repository)</td><td><a href="https://github.com/pumca/cs2-esports-tracker">github.com/pumca/cs2-esports-tracker</a></td></tr>
     <tr><td>DevOps sandbox</td><td>GitHub Actions + GitHub Container Registry</td></tr>
-    <tr><td>Igazolt pipeline-futás</td><td><a href="https://github.com/pumca/cs2-esports-tracker/actions/runs/45485436506">actions/runs/45485436506</a> – <span class="ok">Success</span></td></tr>
+    <tr><td>Igazolt pipeline-futás</td><td><a href="https://github.com/pumca/cs2-esports-tracker/actions/runs/45488994014">actions/runs/45488994014</a> – <span class="ok">Success</span></td></tr>
     <tr><td>Dátum</td><td>2026. november</td></tr>
   </table>
 </section>
@@ -213,7 +213,7 @@
   <li><b>Telepítés a célkörnyezetbe:</b> a deploy job ezt az image-et húzza le a registry-ből, és konténerként elindítja.</li>
   <li><b>Sikeres indulás:</b> a <code>/health</code> „ok” állapotot és a commit SHA-val egyező verziót ad – vagyis pontosan az új artifact fut.</li>
   <li><b>Üzleti funkciók elérhetők:</b> a tabella lekérdezhető, új csapat felvehető, a webes felület betölt.</li>
-  <li><b>Igazolt futás:</b> <a href="https://github.com/pumca/cs2-esports-tracker/actions/runs/45485436506">github.com/pumca/cs2-esports-tracker/actions/runs/45485436506</a> – mindhárom job sikeres, teljes idő 1 perc 16 mp.</li>
+  <li><b>Igazolt futás:</b> <a href="https://github.com/pumca/cs2-esports-tracker/actions/runs/45488994014">github.com/pumca/cs2-esports-tracker/actions/runs/45488994014</a> – mindhárom job sikeres, teljes idő 55 mp.</li>
 </ul>
 <figure><img src="screenshots/09-pipeline-futas.jpg" alt=""><figcaption>1. ábra – A pipeline futása a GitHub Actionsben: Build és teszt → Docker image → Deploy és smoke teszt, mind sikeres</figcaption></figure>
 <figure><img src="screenshots/11-build-teszt.jpg" alt=""><figcaption>2. ábra – A „Build és teszt” job lépései (checkout, Node 22, npm ci, lint, tesztek)</figcaption></figure>
