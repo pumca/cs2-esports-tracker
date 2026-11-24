@@ -166,3 +166,14 @@ input[type=color] { padding: 0; width: 28px; height: 24px; border-radius: 3px; b
 /* logók */
 img.emb.logo { object-fit: contain; background: #eef0f4; border-radius: 5px; padding: 2px; box-sizing: border-box; }
 .prev img.emb.logo { filter: none; }
+.mrow.compact { grid-template-columns: minmax(0,1fr) 64px minmax(0,1fr); }
+
+@media (max-width: 860px) {
+  .top-in { flex-wrap: wrap; height: auto; padding: 8px 12px 0; gap: 4px 12px; align-items: center; }
+  .brand { height: 36px; }
+  .theme { margin-left: auto; }
+  #nav { order: 3; flex: 1 0 100%; }
+  #nav { gap: 0; } #nav a { padding: 10px 6px; font-size: 14px; }
+  #nav a.cta { margin-left: 0; }
+  .bar input#q { width: 100% !important; }
+}

@@ -116,12 +116,12 @@ function emblemBuilder(host, start, onChange) {
 // ---------- nézetek ----------
 function matchRow(m, deletable) {
   const a = teamOf(m.team1Id), b = teamOf(m.team2Id);
-  return `<div class="mrow">
+  return `<div class="mrow${deletable ? '' : ' compact'}">
     <div class="t ${m.winnerId === a.id ? 'w' : ''}">${emblem(a, 26)}<span>${esc(a.name)}</span></div>
     <div class="sc">${m.mapsWon1}<em>:</em>${m.mapsWon2}</div>
     <div class="t b ${m.winnerId === b.id ? 'w' : ''}"><span>${esc(b.name)}</span>${emblem(b, 26)}</div>
-    ${deletable ? `<button class="btn del sm del" data-del-match="${m.id}">Törlés</button>` : `<span class="tag">BO${m.bestOf}</span>`}
-    <div class="mp">${deletable ? `<span>BO${m.bestOf}</span>` : ''}${m.maps.map((x) => `<span>${esc(x.map || 'pálya')} <b>${x.score1}-${x.score2}</b>${Math.max(x.score1, x.score2) > 13 ? ' OT' : ''}</span>`).join('')}</div>
+    ${deletable ? `<button class="btn del sm del" data-del-match="${m.id}">Törlés</button>` : ''}
+    <div class="mp"><span>BO${m.bestOf}</span>${m.maps.map((x) => `<span>${esc(x.map || 'pálya')} <b>${x.score1}-${x.score2}</b>${Math.max(x.score1, x.score2) > 13 ? ' OT' : ''}</span>`).join('')}</div>
   </div>`;
 }
 function standingsTable(rows, full) {

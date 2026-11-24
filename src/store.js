@@ -117,13 +117,12 @@ function createStore(seed = true) {
       ['FaZe Clan', 'EU', 'claw', 'badge', '#d6343b', '/logos/faze.svg'],
       ['G2 Esports', 'EU', 'eye', 'hex', '#2b2f38', '/logos/g2.svg'],
       ['Vitality', 'FR', 'crown', 'circle', '#f0c419', '/logos/vitality.svg'],
-      ['MOUZ', 'EU', 'mountain', 'diamond', '#c9272d', null],
     ].forEach(([n, c, symbol, shape, color, logo]) => addTeam({ name: n, country: c, icon: { shape, symbol, color }, logo }));
     addMatch({ team1Id: 1, team2Id: 2, bestOf: 3, maps: [
       { map: 'Mirage', score1: 13, score2: 9 }, { map: 'Inferno', score1: 11, score2: 13 }, { map: 'Nuke', score1: 16, score2: 14 }] });
     addMatch({ team1Id: 4, team2Id: 3, bestOf: 3, maps: [
       { map: 'Ancient', score1: 13, score2: 5 }, { map: 'Anubis', score1: 13, score2: 10 }] });
-    addMatch({ team1Id: 5, team2Id: 1, bestOf: 1, maps: [{ map: 'Dust2', score1: 13, score2: 11 }] });
+    addMatch({ team1Id: 3, team2Id: 1, bestOf: 1, maps: [{ map: 'Dust2', score1: 13, score2: 11 }] });
   }
 
   return { teams, matches, addTeam, updateTeam, addMatch, deleteMatch, deleteTeam, standings, stats };

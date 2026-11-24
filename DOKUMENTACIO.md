@@ -34,7 +34,7 @@ Az adattárolás szándékosan memóriabeli, mert a feladat hangsúlya az automa
 - **Verziókezelés:** Git + GitHub
 - **CI/CD:** GitHub Actions (a DevOps sandbox)
 - **Csomagolás / artifact:** Docker image, GitHub Container Registry (GHCR)
-- **Tesztek:** Node beépített test runnere (`node --test`), 16 teszt (szabályok + HTTP API)
+- **Tesztek:** Node beépített test runnere (`node --test`), 17 teszt (szabályok + HTTP API)
 
 ```
 git push ─► GitHub ─► Actions pipeline

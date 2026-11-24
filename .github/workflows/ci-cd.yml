@@ -89,4 +89,5 @@ jobs:
             -H 'content-type: application/json' -d '{"name":"Smoke Team","country":"HU"}' | grep 'Smoke Team'
           curl -fsS http://localhost:3000/ | grep 'CS2'
       - name: Összefoglaló
-        run: echo "Sikeres deploy: $IMAGE_LC:${{ github.sha }}" >> "$GITHUB_STEP_SUMMARY"
+        run: |
+          echo "Sikeres deploy: $IMAGE_LC:${{ github.sha }}" >> "$GITHUB_STEP_SUMMARY"

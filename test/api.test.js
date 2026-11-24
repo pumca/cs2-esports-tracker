@@ -84,10 +84,21 @@ test('logó útvonal validálása és a logólista', async () => {
   });
 });
 
+test('hibás JSON és ismeretlen végpont JSON hibát ad', async () => {
+  await withServer(createStore(false), async (base) => {
+    const bad = await fetch(base + '/api/teams', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{nem json' });
+    assert.equal(bad.status, 400);
+    assert.equal((await bad.json()).error, 'érvénytelen JSON');
+    const nf = await fetch(base + '/api/nincs');
+    assert.equal(nf.status, 404);
+    assert.ok((await nf.json()).error);
+  });
+});
+
 test('statisztikák a seed adatokból', async () => {
   await withServer(createStore(), async (base) => {
     const s = await (await fetch(base + '/api/stats')).json();
-    assert.equal(s.teams, 5);
+    assert.equal(s.teams, 4);
     assert.equal(s.matches, 3);
     assert.equal(s.maps, 6);
     assert.equal(s.overtimes, 1);
@@ -110,7 +121,7 @@ test('meccs és csapat törlése', async () => {
 test('seed adatokkal a tabella rendezett', async () => {
   await withServer(createStore(), async (base) => {
     const st = await (await fetch(base + '/api/standings')).json();
-    assert.equal(st.length, 5);
+    assert.equal(st.length, 4);
     for (let i = 1; i < st.length; i++) assert.ok(st[i - 1].points >= st[i].points);
   });
 });

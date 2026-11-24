@@ -50,6 +50,12 @@ function createApp(store = createStore()) {
   app.get('/api/standings', (req, res) => res.json(store.standings()));
   app.get('/api/stats', (req, res) => res.json(store.stats()));
 
+  app.use('/api', (req, res) => res.status(404).json({ error: 'ismeretlen végpont' }));
+  // eslint-disable-next-line no-unused-vars
+  app.use((err, req, res, next) => {
+    res.status(err.status || 500).json({ error: err.type === 'entity.parse.failed' ? 'érvénytelen JSON' : 'szerverhiba' });
+  });
+
   return app;
 }
 
