@@ -12,10 +12,14 @@ Az alkalmazás egy **CS2 (Counter-Strike 2) esport tornakövető**: csapatok és
 | `GET /health` | Állapot + a futó verzió (commit SHA) |
 | `GET/POST /api/teams`, `DELETE /api/teams/:id` | Csapatok listázása / létrehozása / törlése |
 | `GET/POST /api/matches`, `DELETE /api/matches/:id` | Meccsek listázása / rögzítése / törlése |
+| `PATCH /api/teams/:id` | Csapat címerének / országának módosítása |
+| `GET /api/emblems` | Elérhető címerformák és jelképek |
 | `GET /api/standings` | Tabella |
 | `GET /api/stats` | Dashboard statisztikák (meccsek, pályák, körök, hosszabbítások, pályanépszerűség) |
 
-**Admin panel felület** (`public/`): oldalsáv-navigáció, Dashboard (animált számlálók, dobogó, diagramok, legutóbbi meccsek), Tabella, Meccsek (keresés, törlés), Csapatok (kártyák, felvétel/törlés), Új meccs (BO1/3/5 választó, pályánkénti élő CS2-eredményvalidáció), toast értesítések, megerősítő ablak, sötét/világos téma, reszponzív mobilnézet. Külső függőség nélkül (vanilla JS + CSS).
+**Csapatcímerek:** minden csapatnak saját, eredeti SVG-címere van (forma + jelkép + szín, a szerver validálja). A címer a csapat felvételekor élő előnézettel szerkeszthető, később is módosítható. Valódi csapatlogókat szándékosan nem használunk (márkavédelem, külső függés).
+
+**Webes felület** (`public/`): közvetítés-hangulatú, lapos, tabella-központú megjelenés (a CS2 két oldala, T-arany és CT-kék adja a színeket). Oldalak: Áttekintés (számsor, tabella, legutóbbi meccsek, diagramok), Tabella, Meccsek (keresés, törlés), Csapatok (címerszerkesztő), Új meccs (BO1/3/5, pályánként élő CS2-eredményvalidáció). Toast értesítések, megerősítő ablak, sötét/világos téma, reszponzív mobilnézet. Külső függőség nélkül (vanilla JS + CSS).
 
 **Üzleti szabályok** (`src/rules.js`, `src/store.js`):
 - Pályaeredmény: MR12 – 13 nyert körig tart (13-0 … 13-11); 12-12 után MR3 hosszabbítás, így 16-12/13/14, 19-15/16/17 stb. érvényes. Pl. 13-12 vagy 16-15 érvénytelen.
@@ -30,7 +34,7 @@ Az adattárolás szándékosan memóriabeli, mert a feladat hangsúlya az automa
 - **Verziókezelés:** Git + GitHub
 - **CI/CD:** GitHub Actions (a DevOps sandbox)
 - **Csomagolás / artifact:** Docker image, GitHub Container Registry (GHCR)
-- **Tesztek:** Node beépített test runnere (`node --test`), 14 teszt (szabályok + HTTP API)
+- **Tesztek:** Node beépített test runnere (`node --test`), 15 teszt (szabályok + HTTP API)
 
 ```
 git push ─► GitHub ─► Actions pipeline

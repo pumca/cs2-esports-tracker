@@ -52,6 +52,23 @@ test('érvénytelen meccs 400-at ad', async () => {
   });
 });
 
+test('csapatikon létrehozása, módosítása és validálása', async () => {
+  await withServer(createStore(false), async (base) => {
+    const ok = await post(base + '/api/teams', { name: 'Ikon FC', icon: { shape: 'hex', symbol: 'star', color: '#AA33CC' } });
+    assert.equal(ok.status, 201);
+    assert.equal((await ok.json()).icon.color, '#aa33cc');
+    const bad = await post(base + '/api/teams', { name: 'Rossz FC', icon: { shape: 'nincs', symbol: 'star', color: '#aa33cc' } });
+    assert.equal(bad.status, 400);
+    const patch = await fetch(base + '/api/teams/1', { method: 'PATCH', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ icon: { shape: 'circle', symbol: 'bolt', color: '#112233' } }) });
+    assert.equal(patch.status, 200);
+    assert.equal((await patch.json()).icon.shape, 'circle');
+    const badColor = await fetch(base + '/api/teams/1', { method: 'PATCH', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ icon: { shape: 'circle', symbol: 'bolt', color: 'red' } }) });
+    assert.equal(badColor.status, 400);
+  });
+});
+
 test('statisztikák a seed adatokból', async () => {
   await withServer(createStore(), async (base) => {
     const s = await (await fetch(base + '/api/stats')).json();

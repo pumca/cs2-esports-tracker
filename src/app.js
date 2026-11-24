@@ -2,6 +2,7 @@
 const path = require('path');
 const express = require('express');
 const { createStore } = require('./store');
+const { SHAPES, SYMBOLS } = require('./emblems');
 
 function createApp(store = createStore()) {
   const app = express();
@@ -26,6 +27,11 @@ function createApp(store = createStore()) {
     catch (e) { res.status(400).json({ error: e.message }); }
   });
 
+  app.patch('/api/teams/:id', (req, res) => {
+    try { res.json(store.updateTeam(Number(req.params.id), req.body || {})); }
+    catch (e) { res.status(400).json({ error: e.message }); }
+  });
+  app.get('/api/emblems', (req, res) => res.json({ shapes: SHAPES, symbols: SYMBOLS }));
   app.delete('/api/teams/:id', (req, res) => {
     try { store.deleteTeam(Number(req.params.id)); res.status(204).end(); }
     catch (e) { res.status(400).json({ error: e.message }); }

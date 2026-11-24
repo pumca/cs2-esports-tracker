@@ -4,33 +4,25 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CS2 Esports Tracker</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23ff8a1f'/%3E%3Ccircle cx='16' cy='16' r='7' fill='none' stroke='%23111' stroke-width='3'/%3E%3Ccircle cx='16' cy='16' r='2' fill='%23111'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2l12 5v9c0 7-5 12-12 14C9 28 4 23 4 16V7z' fill='%23e0a526'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="shell">
-  <aside class="sidebar" id="sidebar">
-    <div class="brand"><span class="logo"></span><div><b>CS2 Tracker</b><small>Esports admin</small></div></div>
+<header class="top">
+  <div class="top-in">
+    <a class="brand" href="#/dashboard"><b>CS2</b> Tracker</a>
     <nav id="nav">
-      <a href="#/dashboard" data-route="dashboard"><i>▦</i>Dashboard</a>
-      <a href="#/standings" data-route="standings"><i>🏆</i>Tabella</a>
-      <a href="#/matches" data-route="matches"><i>⚔</i>Meccsek</a>
-      <a href="#/teams" data-route="teams"><i>👥</i>Csapatok</a>
-      <a href="#/new-match" data-route="new-match"><i>＋</i>Új meccs</a>
+      <a href="#/dashboard" data-route="dashboard">Áttekintés</a>
+      <a href="#/standings" data-route="standings">Tabella</a>
+      <a href="#/matches" data-route="matches">Meccsek</a>
+      <a href="#/teams" data-route="teams">Csapatok</a>
+      <a href="#/new-match" data-route="new-match" class="cta">+ Meccs</a>
     </nav>
-    <div class="side-foot"><span class="dot"></span><span id="ver">kapcsolódás…</span></div>
-  </aside>
-
-  <div class="main">
-    <header class="topbar">
-      <button class="icon-btn menu" id="menu" aria-label="Menü">☰</button>
-      <h1 id="title">Dashboard</h1>
-      <div class="grow"></div>
-      <button class="icon-btn" id="theme" aria-label="Téma váltás">◐</button>
-    </header>
-    <main id="view" class="view"></main>
+    <span class="ver" id="ver"></span>
+    <button class="theme" id="theme" title="Téma váltása" aria-label="Téma váltása">Téma</button>
   </div>
-</div>
+</header>
+<main id="view" class="view"></main>
 <div id="toasts" class="toasts"></div>
 <div id="modal" class="modal hidden"><div class="modal-box" id="modal-box"></div></div>
 <script src="app.js"></script>
