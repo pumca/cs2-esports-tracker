@@ -14,4 +14,13 @@ function validateIcon(icon) {
   return { shape, symbol, color: color.toLowerCase() };
 }
 
-module.exports = { SHAPES, SYMBOLS, validateIcon };
+// Hivatalos logó: csak a public/logos mappában lévő fájlra mutató útvonal fogadható el.
+function validateLogo(logo) {
+  if (logo === undefined || logo === null || logo === '') return null;
+  if (typeof logo !== 'string' || !/^\/logos\/[a-z0-9_-]+\.(svg|png|webp)$/.test(logo)) {
+    throw new Error('érvénytelen logó útvonal');
+  }
+  return logo;
+}
+
+module.exports = { SHAPES, SYMBOLS, validateIcon, validateLogo };

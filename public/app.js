@@ -3,7 +3,7 @@ const $ = (s, r = document) => r.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const MAPS = ['Mirage', 'Inferno', 'Nuke', 'Ancient', 'Anubis', 'Dust2', 'Overpass'];
 const PALETTE = ['#e8b923', '#d6343b', '#2f6fdb', '#2e9e6a', '#7d4fc9', '#e8702a', '#1f2430', '#e9ecf1'];
-const state = { teams: [], matches: [], standings: [], stats: null };
+const state = { teams: [], matches: [], standings: [], stats: null, logos: [] };
 
 // ---------- címerek (saját, eredeti SVG-k; 48x48 alap, jelkép 24x24 rácson) ----------
 const SHAPES = {
@@ -40,7 +40,9 @@ function emblemSvg(ic, size = 32) {
     <g fill="${ic.color}" stroke="rgba(0,0,0,.4)" stroke-width="1.5">${SHAPES[ic.shape]}</g>
     <g transform="translate(12 12)" fill="${ink}" color="${ink}" style="--sym-bg:${ic.color}">${SYMBOLS[ic.symbol]}</g></svg>`;
 }
-const emblem = (t, size) => emblemSvg(iconOf(t), size);
+const emblem = (t, size) => t.logo
+  ? `<img class="emb logo" src="${esc(t.logo)}" width="${size}" height="${size}" alt="${esc(t.name)}" loading="lazy">`
+  : emblemSvg(iconOf(t), size);
 
 // ---------- segédek ----------
 async function api(url, opts) {
@@ -79,15 +81,18 @@ const stagger = (root) => root.querySelectorAll('tbody tr, .mrow, .tc').forEach(
 const grow = (root) => requestAnimationFrame(() => requestAnimationFrame(() => root.querySelectorAll('[data-w]').forEach((el) => { el.style.width = el.dataset.w + '%'; })));
 
 async function refresh() {
-  [state.teams, state.matches, state.standings, state.stats] = await Promise.all([
-    api('/api/teams'), api('/api/matches'), api('/api/standings'), api('/api/stats')]);
+  [state.teams, state.matches, state.standings, state.stats, state.logos] = await Promise.all([
+    api('/api/teams'), api('/api/matches'), api('/api/standings'), api('/api/stats'), api('/api/logos')]);
 }
 
 // ---------- címerszerkesztő ----------
 function emblemBuilder(host, start, onChange) {
   const ic = { ...start };
+  const logoName = (p) => p.split('/').pop().replace(/.w+$/, '');
   const draw = () => {
-    host.innerHTML = `<div class="eb"><div class="prev">${emblemSvg(ic, 72)}</div><div class="opts">
+    const prev = ic.logo ? `<img class="emb logo" src="${esc(ic.logo)}" width="72" height="72" alt="">` : emblemSvg(ic, 72);
+    host.innerHTML = `<div class="eb"><div class="prev">${prev}</div><div class="opts">
+      ${state.logos.length ? `<div class="field">Hivatalos logó<div class="chips">${state.logos.map((p) => `<button type="button" class="chip ${ic.logo === p ? 'on' : ''}" data-logo="${esc(p)}" title="${esc(logoName(p))}"><img class="emb logo" src="${esc(p)}" width="26" height="26" alt=""></button>`).join('')}<button type="button" class="btn sec sm" data-logo="">Saját címer</button></div></div>` : ''}
       <div class="field">Forma<div class="chips">${Object.keys(SHAPES).map((k) => `<button type="button" class="chip ${ic.shape === k ? 'on' : ''}" data-shape="${k}" title="${k}">${emblemSvg({ ...ic, shape: k, symbol: ic.symbol }, 26)}</button>`).join('')}</div></div>
       <div class="field">Jelkép<div class="chips">${Object.keys(SYMBOLS).map((k) => `<button type="button" class="chip ${ic.symbol === k ? 'on' : ''}" data-symbol="${k}" title="${k}">${emblemSvg({ ...ic, symbol: k }, 26)}</button>`).join('')}</div></div>
       <div class="field">Szín<div class="chips">${PALETTE.map((c) => `<button type="button" class="sw ${ic.color === c ? 'on' : ''}" data-color="${c}" style="background:${c}" aria-label="${c}"></button>`).join('')}<input type="color" value="${ic.color}" data-custom></div></div>
@@ -95,13 +100,15 @@ function emblemBuilder(host, start, onChange) {
     onChange(ic);
   };
   host.onclick = (e) => {
-    const b = e.target.closest('[data-shape],[data-symbol],[data-color]'); if (!b) return;
+    const b = e.target.closest('[data-shape],[data-symbol],[data-color],[data-logo]'); if (!b) return;
+    if (b.dataset.logo !== undefined) { ic.logo = b.dataset.logo || null; draw(); return; }
+    ic.logo = null;
     if (b.dataset.shape) ic.shape = b.dataset.shape;
     if (b.dataset.symbol) ic.symbol = b.dataset.symbol;
     if (b.dataset.color) ic.color = b.dataset.color;
     draw();
   };
-  host.oninput = (e) => { if (e.target.dataset.custom !== undefined) { ic.color = e.target.value; draw(); } };
+  host.oninput = (e) => { if (e.target.dataset.custom !== undefined) { ic.color = e.target.value; ic.logo = null; draw(); } };
   draw();
   return ic;
 }
@@ -176,11 +183,11 @@ const views = {
         return `<div class="tc">${emblem(t, 56)}<div class="info"><h3>${esc(t.name)}</h3><p>${esc(t.country || '—')} · ${r.wins || 0} gy / ${r.losses || 0} v · ${r.points || 0} pont</p>
           <div class="acts"><button class="btn sec sm" data-edit-team="${t.id}">Címer</button><button class="btn del sm" data-del-team="${t.id}">Törlés</button></div></div></div>`;
       }).join('')}</div>`;
-    let ic = { shape: 'shield', symbol: 'bolt', color: PALETTE[Math.floor(Math.random() * 6)] };
+    let ic = { shape: 'shield', symbol: 'bolt', color: PALETTE[Math.floor(Math.random() * 6)], logo: null };
     ic = emblemBuilder($('#eb', el), ic, () => {});
     $('#tf', el).onsubmit = async (e) => {
       e.preventDefault();
-      try { await send('POST', '/api/teams', { name: e.target.name.value, country: e.target.country.value, icon: ic }); toast('Csapat felvéve'); await go(); }
+      try { await send('POST', '/api/teams', { name: e.target.name.value, country: e.target.country.value, icon: { shape: ic.shape, symbol: ic.symbol, color: ic.color }, logo: ic.logo || null }); toast('Csapat felvéve'); await go(); }
       catch (x) { toast(x.message, true); }
     };
     stagger(el);
@@ -230,7 +237,10 @@ const routes = ['dashboard', 'standings', 'matches', 'teams', 'new-match'];
 async function go() {
   const r = location.hash.replace('#/', '');
   const name = routes.includes(r) ? r : 'dashboard';
-  try { await refresh(); } catch (e) { toast(e.message, true); return; }
+  try { await refresh(); } catch (e) {
+    $('#view').innerHTML = `<div class="panel pad"><h2>Nem érem el a szervert</h2><p class="mut">Az oldalt az alkalmazás szerverén keresztül kell megnyitni (nem fájlként). Indítsd el a <b>start.bat</b>-ot, vagy futtasd az <b>npm start</b> parancsot, majd nyisd meg: <b>http://localhost:3000</b></p></div>`;
+    return;
+  }
   document.querySelectorAll('#nav a').forEach((a) => a.classList.toggle('active', a.dataset.route === name));
   const v = $('#view'); v.innerHTML = '';
   views[name](v);
@@ -249,10 +259,10 @@ document.addEventListener('click', async (e) => {
   if (et) {
     const t = teamOf(Number(et.dataset.editTeam));
     openModal(`<h3>${esc(t.name)} – címer</h3><div id="meb"></div><div class="acts"><button class="btn sec" id="mc">Mégse</button><button class="btn" id="ms">Mentés</button></div>`);
-    const ic = emblemBuilder($('#meb'), iconOf(t), () => {});
+    const ic = emblemBuilder($('#meb'), { ...iconOf(t), logo: t.logo || null }, () => {});
     $('#mc').onclick = closeModal;
     $('#ms').onclick = async () => {
-      try { await send('PATCH', '/api/teams/' + t.id, { icon: ic }); closeModal(); toast('Címer mentve'); await go(); } catch (x) { toast(x.message, true); }
+      try { await send('PATCH', '/api/teams/' + t.id, { icon: { shape: ic.shape, symbol: ic.symbol, color: ic.color }, logo: ic.logo || null }); closeModal(); toast('Címer mentve'); await go(); } catch (x) { toast(x.message, true); }
     };
   }
 });

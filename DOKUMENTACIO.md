@@ -17,7 +17,7 @@ Az alkalmazás egy **CS2 (Counter-Strike 2) esport tornakövető**: csapatok és
 | `GET /api/standings` | Tabella |
 | `GET /api/stats` | Dashboard statisztikák (meccsek, pályák, körök, hosszabbítások, pályanépszerűség) |
 
-**Csapatcímerek:** minden csapatnak saját, eredeti SVG-címere van (forma + jelkép + szín, a szerver validálja). A címer a csapat felvételekor élő előnézettel szerkeszthető, később is módosítható. Valódi csapatlogókat szándékosan nem használunk (márkavédelem, külső függés).
+**Csapatlogók és címerek:** a csapatok hivatalos logója a `public/logos/` mappából jön (NAVI, FaZe Clan, G2 Esports, Vitality; forrás: Wikimedia Commons / Wikipedia, a logók az érintett szervezetek védjegyei, itt kizárólag oktatási célra szerepelnek). Új logó egyszerűen a mappába másolt `.svg`/`.png` fájllal bővíthető, a Csapatok oldalon kiválasztható. Ha egy csapatnak nincs logója, helyette a saját, eredeti SVG-címere jelenik meg (forma + jelkép + szín, élő előnézettel szerkeszthető). A szerver validálja a logóútvonalat és a címert is (`logo`, `icon` mező).
 
 **Webes felület** (`public/`): közvetítés-hangulatú, lapos, tabella-központú megjelenés (a CS2 két oldala, T-arany és CT-kék adja a színeket). Oldalak: Áttekintés (számsor, tabella, legutóbbi meccsek, diagramok), Tabella, Meccsek (keresés, törlés), Csapatok (címerszerkesztő), Új meccs (BO1/3/5, pályánként élő CS2-eredményvalidáció). Toast értesítések, megerősítő ablak, sötét/világos téma, reszponzív mobilnézet. Külső függőség nélkül (vanilla JS + CSS).
 
@@ -34,7 +34,7 @@ Az adattárolás szándékosan memóriabeli, mert a feladat hangsúlya az automa
 - **Verziókezelés:** Git + GitHub
 - **CI/CD:** GitHub Actions (a DevOps sandbox)
 - **Csomagolás / artifact:** Docker image, GitHub Container Registry (GHCR)
-- **Tesztek:** Node beépített test runnere (`node --test`), 15 teszt (szabályok + HTTP API)
+- **Tesztek:** Node beépített test runnere (`node --test`), 16 teszt (szabályok + HTTP API)
 
 ```
 git push ─► GitHub ─► Actions pipeline
@@ -57,6 +57,7 @@ Multi-stage build: az első fázisban `npm ci --omit=dev`, a második fázis csa
 
 ## 6. Futtatás helyben
 ```
+start.bat                 # Windows: telepít, elindít és megnyitja a böngészőt
 npm install
 npm test
 npm start                 # http://localhost:3000

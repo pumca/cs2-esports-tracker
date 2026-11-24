@@ -1,6 +1,6 @@
 'use strict';
 const { evaluateSeries } = require('./rules');
-const { validateIcon } = require('./emblems');
+const { validateIcon, validateLogo } = require('./emblems');
 
 // Egyszerű memóriabeli tár (a feladat hangsúlya a CI/CD, nem az adatbázis).
 function createStore(seed = true) {
@@ -9,7 +9,7 @@ function createStore(seed = true) {
   let teamId = 1;
   let matchId = 1;
 
-  function addTeam({ name, country, icon }) {
+  function addTeam({ name, country, icon, logo }) {
     if (typeof name !== 'string' || name.trim().length < 2) throw new Error('a csapatnév legalább 2 karakter');
     const n = name.trim();
     if (teams.some((t) => t.name.toLowerCase() === n.toLowerCase())) throw new Error('ilyen nevű csapat már létezik');
@@ -17,15 +17,17 @@ function createStore(seed = true) {
       id: teamId++, name: n,
       country: (country || '').toString().trim().toUpperCase().slice(0, 3),
       icon: validateIcon(icon),
+      logo: validateLogo(logo),
     };
     teams.push(team);
     return team;
   }
 
-  function updateTeam(id, { country, icon }) {
+  function updateTeam(id, { country, icon, logo }) {
     const t = teams.find((x) => x.id === id);
     if (!t) throw new Error('ismeretlen csapat');
     if (icon !== undefined) t.icon = validateIcon(icon);
+    if (logo !== undefined) t.logo = validateLogo(logo);
     if (country !== undefined) t.country = (country || '').toString().trim().toUpperCase().slice(0, 3);
     return t;
   }
@@ -111,12 +113,12 @@ function createStore(seed = true) {
 
   if (seed) {
     [
-      ['NAVI', 'UA', 'bolt', 'shield', '#e8b923'],
-      ['FaZe Clan', 'EU', 'claw', 'badge', '#d6343b'],
-      ['G2 Esports', 'EU', 'eye', 'hex', '#2b2f38'],
-      ['Vitality', 'FR', 'crown', 'circle', '#f0c419'],
-      ['MOUZ', 'EU', 'mountain', 'diamond', '#c9272d'],
-    ].forEach(([n, c, symbol, shape, color]) => addTeam({ name: n, country: c, icon: { shape, symbol, color } }));
+      ['NAVI', 'UA', 'bolt', 'shield', '#e8b923', '/logos/navi.svg'],
+      ['FaZe Clan', 'EU', 'claw', 'badge', '#d6343b', '/logos/faze.svg'],
+      ['G2 Esports', 'EU', 'eye', 'hex', '#2b2f38', '/logos/g2.svg'],
+      ['Vitality', 'FR', 'crown', 'circle', '#f0c419', '/logos/vitality.svg'],
+      ['MOUZ', 'EU', 'mountain', 'diamond', '#c9272d', null],
+    ].forEach(([n, c, symbol, shape, color, logo]) => addTeam({ name: n, country: c, icon: { shape, symbol, color }, logo }));
     addMatch({ team1Id: 1, team2Id: 2, bestOf: 3, maps: [
       { map: 'Mirage', score1: 13, score2: 9 }, { map: 'Inferno', score1: 11, score2: 13 }, { map: 'Nuke', score1: 16, score2: 14 }] });
     addMatch({ team1Id: 4, team2Id: 3, bestOf: 3, maps: [

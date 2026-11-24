@@ -10,7 +10,7 @@
 
 **3. A pipeline (45 mp)** – mutasd a GitHub Actions fület
 - Változtass egy apróságot, commit, push.
-- Három szakasz: **build-test** (lint + 15 teszt) → **docker** (image a GHCR-be) → **deploy** (konténer indul, smoke teszt).
+- Három szakasz: **build-test** (lint + 16 teszt) → **docker** (image a GHCR-be) → **deploy** (konténer indul, smoke teszt).
 - Ha a teszt elbukik, nincs image és nincs deploy.
 
 **4. Bizonyíték a működésre (20 mp)**

@@ -69,6 +69,21 @@ test('csapatikon létrehozása, módosítása és validálása', async () => {
   });
 });
 
+test('logó útvonal validálása és a logólista', async () => {
+  await withServer(createStore(), async (base) => {
+    const logos = await (await fetch(base + '/api/logos')).json();
+    assert.ok(logos.includes('/logos/navi.svg'));
+    const teams = await (await fetch(base + '/api/teams')).json();
+    assert.equal(teams[0].logo, '/logos/navi.svg');
+    const bad = await fetch(base + '/api/teams/1', { method: 'PATCH', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ logo: 'http://evil.example/x.svg' }) });
+    assert.equal(bad.status, 400);
+    const clear = await fetch(base + '/api/teams/1', { method: 'PATCH', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ logo: null }) });
+    assert.equal((await clear.json()).logo, null);
+  });
+});
+
 test('statisztikák a seed adatokból', async () => {
   await withServer(createStore(), async (base) => {
     const s = await (await fetch(base + '/api/stats')).json();

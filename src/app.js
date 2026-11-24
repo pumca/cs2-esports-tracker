@@ -1,4 +1,5 @@
 'use strict';
+const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const { createStore } = require('./store');
@@ -32,6 +33,11 @@ function createApp(store = createStore()) {
     catch (e) { res.status(400).json({ error: e.message }); }
   });
   app.get('/api/emblems', (req, res) => res.json({ shapes: SHAPES, symbols: SYMBOLS }));
+  app.get('/api/logos', (req, res) => {
+    let files = [];
+    try { files = fs.readdirSync(path.join(__dirname, '..', 'public', 'logos')); } catch (e) { /* nincs mappa */ }
+    res.json(files.filter((f) => /^[a-z0-9_-]+\.(svg|png|webp)$/.test(f)).sort().map((f) => '/logos/' + f));
+  });
   app.delete('/api/teams/:id', (req, res) => {
     try { store.deleteTeam(Number(req.params.id)); res.status(204).end(); }
     catch (e) { res.status(400).json({ error: e.message }); }

@@ -34,7 +34,7 @@ h1, h2, h3 { margin: 0; font-weight: 600; }
 
 .view { max-width: 1120px; margin: 0 auto; padding: 28px 20px 60px; }
 .view > * { animation: in .28s ease-out both; }
-@keyframes in { from { opacity: 0; transform: translateY(6px); } }
+@keyframes in { from { transform: translateY(6px); } }
 .page-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 18px; flex-wrap: wrap; }
 .page-head h1 { font-size: 26px; }
 .page-head p { margin: 0; color: var(--muted); }
@@ -162,3 +162,7 @@ input[type=color] { padding: 0; width: 28px; height: 24px; border-radius: 3px; b
   .eb { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* logók */
+img.emb.logo { object-fit: contain; background: #eef0f4; border-radius: 5px; padding: 2px; box-sizing: border-box; }
+.prev img.emb.logo { filter: none; }
