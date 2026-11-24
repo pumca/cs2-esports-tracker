@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<title>CS2 Esports Tracker – CI/CD projektdokumentáció</title>
+<style>
+  @page { size: A4; margin: 18mm 17mm 18mm 17mm; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", Calibri, Arial, sans-serif; color: #1c2029; font-size: 10.5pt; line-height: 1.5; margin: 0; }
+  h1 { font-size: 26pt; margin: 0 0 6px; line-height: 1.15; }
+  h2 { font-size: 15pt; margin: 26px 0 8px; padding-bottom: 4px; border-bottom: 2px solid #e0a526; break-after: avoid; }
+  h3 { font-size: 11.5pt; margin: 16px 0 6px; break-after: avoid; }
+  p { margin: 0 0 8px; }
+  ul, ol { margin: 0 0 8px; padding-left: 20px; }
+  li { margin-bottom: 3px; }
+  code { font-family: Consolas, "Cascadia Mono", monospace; font-size: 9pt; background: #f1f3f6; padding: 1px 4px; border-radius: 3px; }
+  pre { font-family: Consolas, "Cascadia Mono", monospace; font-size: 8.6pt; background: #f4f5f8; border: 1px solid #e1e4ea; border-radius: 4px; padding: 10px 12px; white-space: pre-wrap; line-height: 1.4; break-inside: avoid; }
+  table { width: 100%; border-collapse: collapse; margin: 6px 0 10px; font-size: 9.5pt; break-inside: avoid; }
+  th, td { border: 1px solid #d9dde4; padding: 5px 8px; text-align: left; vertical-align: top; }
+  th { background: #f1f3f6; font-weight: 600; }
+  figure { margin: 10px 0 14px; break-inside: avoid; }
+  figure img { width: 100%; border: 1px solid #d0d4db; border-radius: 4px; display: block; }
+  figure.narrow img { width: 46%; margin: 0 auto; }
+  figcaption { font-size: 9pt; color: #5d6574; margin-top: 4px; text-align: center; }
+  a { color: #1f5fbf; text-decoration: none; }
+  .cover { height: 250mm; display: flex; flex-direction: column; justify-content: space-between; break-after: page; }
+  .cover .tag { color: #b9810a; font-weight: 700; letter-spacing: .08em; font-size: 10pt; text-transform: uppercase; margin-bottom: 14px; }
+  .cover .sub { font-size: 13pt; color: #4a5160; margin-bottom: 26px; }
+  .cover img { width: 100%; border: 1px solid #d0d4db; border-radius: 4px; }
+  .cover .meta td { border: 0; padding: 3px 0; font-size: 11pt; }
+  .cover .meta td:first-child { color: #5d6574; width: 46mm; }
+  .box { border-left: 4px solid #e0a526; background: #fbf6ea; padding: 8px 12px; margin: 8px 0 12px; break-inside: avoid; }
+  .ok { color: #1f8a4c; font-weight: 600; }
+  .toc ol { columns: 2; }
+  .page-break { break-before: page; }
+</style>
+</head>
+<body>
+
+<section class="cover">
+  <div>
+    <div class="tag">DevOps projektfeladat · CI/CD pipeline megvalósítása</div>
+    <h1>CS2 Esports Tracker</h1>
+    <div class="sub">Counter-Strike 2 esport tornakövető mini alkalmazás, teljes körű (end-to-end) CI/CD folyamattal</div>
+    <img src="screenshots/01-attekintes.png" alt="Az alkalmazás áttekintő oldala">
+  </div>
+  <table class="meta">
+    <tr><td>Készítette</td><td><b>NWXGKT</b></td></tr>
+    <tr><td>Forráskód (Git repository)</td><td><a href="https://github.com/pumca/cs2-esports-tracker">github.com/pumca/cs2-esports-tracker</a></td></tr>
+    <tr><td>DevOps sandbox</td><td>GitHub Actions + GitHub Container Registry</td></tr>
+    <tr><td>Igazolt pipeline-futás</td><td><a href="https://github.com/pumca/cs2-esports-tracker/actions/runs/45485436506">actions/runs/45485436506</a> – <span class="ok">Success</span></td></tr>
+    <tr><td>Dátum</td><td>2026. november</td></tr>
+  </table>
+</section>
+
+<div class="toc">
+<h2>Tartalom</h2>
+<ol>
+  <li>A feladat és a megoldás összefoglalása</li>
+  <li>Az alkalmazás – üzleti funkciók</li>
+  <li>Architektúra és eszközök</li>
+  <li>Projektszerkezet</li>
+  <li>Verziókezelés (Git)</li>
+  <li>A CI/CD pipeline</li>
+  <li>Konténerizálás (Dockerfile)</li>
+  <li>Tesztelés</li>
+  <li>Definition of Done – igazolás</li>
+  <li>Futtatás és telepítés</li>
+  <li>Képernyőképek</li>
+  <li>Továbbfejlesztési lehetőségek</li>
+</ol>
+</div>
+
+<h2>1. A feladat és a megoldás összefoglalása</h2>
+<p>A feladat egy egyszerű üzleti funkcionalitású mini alkalmazás, valamint egy teljes körű CI/CD folyamat elkészítése volt egy szabadon választott DevOps sandbox környezetben, verziókezelő (Git) használatával. A forráskód feltöltésének (<code>git push</code>) hatására a pipeline-nak automatikusan buildelnie, tesztelnie és telepítenie kell az alkalmazást.</p>
+<p>A megoldás egy <b>CS2 (Counter-Strike 2) esport tornakövető</b> webalkalmazás. Csapatokat és meccseket (BO1/BO3/BO5) lehet benne rögzíteni, a pályaeredményeket a játék szabályai szerint ellenőrzi, és automatikusan számolja a tabellát. A forráskód a GitHubon van, a pipeline a <b>GitHub Actions</b> sandboxban fut, a telepíthető artifact egy <b>Docker image</b>, amely a <b>GitHub Container Registry</b>-be (GHCR) kerül.</p>
+<div class="box"><b>Eredmény:</b> minden push után kb. 1 perc alatt lefut a build → teszt → image készítés → deploy → smoke teszt lánc. A telepített konténer elindul, és a smoke teszt igazolja, hogy az üzleti funkciók elérhetők, és pontosan az aktuális commitból készült verzió fut.</div>
+
+<h2>2. Az alkalmazás – üzleti funkciók</h2>
+<h3>2.1 Funkciók</h3>
+<ul>
+  <li><b>Csapatok kezelése:</b> felvétel névvel, országkóddal és logóval; törlés (csak ha nincs meccse). A csapatok hivatalos logót vagy saját, szerkeszthető SVG-címert kapnak.</li>
+  <li><b>Meccsek rögzítése:</b> két csapat, sorozat típusa (BO1/BO3/BO5), pályánként a pálya neve és az eredmény. Hibás eredményt a felület azonnal jelez, a szerver elutasítja.</li>
+  <li><b>Tabella:</b> automatikusan számolt pont (győzelem = 3 pont), pálya- és körkülönbség, helyezés.</li>
+  <li><b>Áttekintés (dashboard):</b> összesítő számok, tabella, legutóbbi meccsek, pontdiagram, pályanépszerűség.</li>
+  <li><b>Egyéb:</b> keresés a meccsek között, törlés megerősítéssel, sötét/világos téma, mobilbarát nézet.</li>
+</ul>
+<h3>2.2 Üzleti szabályok (<code>src/rules.js</code>, <code>src/store.js</code>)</h3>
+<ul>
+  <li><b>Pályaeredmény (MR12):</b> a pálya 13 nyert körig tart (13-0 … 13-11). 12-12 után MR3 hosszabbítás jön, így érvényes pl. a 16-14, 16-12, 19-17. Érvénytelen pl. a 13-12, 14-12 vagy 16-15.</li>
+  <li><b>Sorozat:</b> a győzelemhez <code>ceil(BO/2)</code> megnyert pálya kell. A már eldőlt sorozat utáni pálya és a hiányzó pálya hibát ad.</li>
+  <li><b>Tabella-sorrend:</b> pont → pályakülönbség → körkülönbség → név.</li>
+  <li>Azonos nevű csapat és önmaga elleni meccs nem rögzíthető.</li>
+</ul>
+<h3>2.3 REST API</h3>
+<table>
+  <tr><th style="width:44%">Végpont</th><th>Leírás</th></tr>
+  <tr><td><code>GET /</code></td><td>Webes felület (single page application)</td></tr>
+  <tr><td><code>GET /health</code></td><td>Állapot és a futó verzió (commit SHA) – a deploy ellenőrzi</td></tr>
+  <tr><td><code>GET / POST /api/teams</code></td><td>Csapatok listázása / felvétele</td></tr>
+  <tr><td><code>PATCH / DELETE /api/teams/:id</code></td><td>Csapat logójának, címerének módosítása / csapat törlése</td></tr>
+  <tr><td><code>GET / POST /api/matches</code>, <code>DELETE /api/matches/:id</code></td><td>Meccsek listázása / rögzítése / törlése</td></tr>
+  <tr><td><code>GET /api/standings</code></td><td>Tabella</td></tr>
+  <tr><td><code>GET /api/stats</code></td><td>Statisztikák az áttekintő oldalhoz</td></tr>
+  <tr><td><code>GET /api/logos</code>, <code>GET /api/emblems</code></td><td>Elérhető logók, címerformák és jelképek</td></tr>
+</table>
+<p>Hibás kérésre (érvénytelen eredmény, hibás JSON, ismeretlen végpont) az API minden esetben JSON hibaüzenetet ad (<code>400</code> / <code>404</code>). Az adattárolás szándékosan memóriabeli: a feladat hangsúlya az üzemeltetési és automatizálási folyamaton van.</p>
+
+<h2>3. Architektúra és eszközök</h2>
+<table>
+  <tr><th style="width:32%">Terület</th><th>Eszköz</th></tr>
+  <tr><td>Alkalmazás</td><td>Node.js 22 LTS, Express 4; felület: HTML + CSS + JavaScript (külső függőség nélkül)</td></tr>
+  <tr><td>Verziókezelés</td><td>Git, GitHub (<code>main</code> ág)</td></tr>
+  <tr><td>CI/CD sandbox</td><td>GitHub Actions (ubuntu-latest runner)</td></tr>
+  <tr><td>Artifact</td><td>Docker image (multi-stage, node:22-alpine alap)</td></tr>
+  <tr><td>Artifact tároló</td><td>GitHub Container Registry – <code>ghcr.io/pumca/cs2-esports-tracker</code></td></tr>
+  <tr><td>Tesztelés</td><td>Node beépített tesztfuttatója (<code>node --test</code>), 17 teszt; smoke teszt <code>curl</code>-lel</td></tr>
+</table>
+<pre>fejlesztő ──git push──► GitHub repository (main)
+                              │  (automatikus trigger)
+                              ▼
+                     GitHub Actions – CI/CD workflow
+   ┌────────────────┐   ┌──────────────────────────┐   ┌───────────────────────────────┐
+   │ 1. Build és    │──►│ 2. Docker image build és │──►│ 3. Deploy a sandboxba és      │
+   │    teszt       │   │    publikálás (GHCR)     │   │    smoke teszt                │
+   │ npm ci, lint,  │   │ :latest és :&lt;commit SHA&gt; │   │ docker pull → docker run →    │
+   │ 17 teszt       │   │                          │   │ /health, API, felület ellenőrz│
+   └────────────────┘   └──────────────────────────┘   └───────────────────────────────┘</pre>
+
+<h2>4. Projektszerkezet</h2>
+<pre>cs2-esports-tracker/
+├── .github/workflows/ci-cd.yml   CI/CD pipeline definíció
+├── Dockerfile                    konténer (multi-stage)
+├── docker-compose.yml            helyi futtatás Dockerrel
+├── .dockerignore, .gitignore
+├── package.json, package-lock.json
+├── start.bat                     egykattintásos indítás Windowson
+├── src/
+│   ├── server.js                 belépési pont (port: PORT, alapért. 3000)
+│   ├── app.js                    Express alkalmazás, REST API, hibakezelés
+│   ├── store.js                  adattár, tabella- és statisztikaszámítás, demóadat
+│   ├── rules.js                  CS2 szabályok (pályaeredmény, sorozat)
+│   └── emblems.js                logó- és címervalidáció
+├── public/                       webes felület (index.html, app.js, style.css, logos/)
+├── test/                         rules.test.js, api.test.js
+└── docs/                         dokumentáció és képernyőképek</pre>
+
+<h2>5. Verziókezelés (Git)</h2>
+<ul>
+  <li>A kód a <a href="https://github.com/pumca/cs2-esports-tracker">pumca/cs2-esports-tracker</a> repositoryban van, a fő ág a <code>main</code>.</li>
+  <li>A változások kis, leíró üzenetű commitokban kerültek fel (alkalmazás és pipeline, felület, logók, javítások, Actions-frissítés).</li>
+  <li>A <code>node_modules</code> nem kerül a repóba (<code>.gitignore</code>); a függőségeket a <code>package-lock.json</code> rögzíti, így a build reprodukálható (<code>npm ci</code>).</li>
+  <li>Pull request esetén csak a build és teszt fut, publikálás és deploy nem – így a <code>main</code> ágra csak ellenőrzött kód kerül ki.</li>
+</ul>
+
+<h2>6. A CI/CD pipeline</h2>
+<p>A pipeline definíciója: <code>.github/workflows/ci-cd.yml</code>. Indul minden <code>main</code> ágra történő pushnál, pull requestnél és kézzel is (<code>workflow_dispatch</code>). Három, egymásra épülő job-ból áll; ha egy lépés hibázik, a következő nem fut le.</p>
+<h3>6.1 Build és teszt</h3>
+<ol>
+  <li>Forráskód letöltése (<code>actions/checkout@v7</code>), Node.js 22 telepítése npm gyorsítótárral (<code>actions/setup-node@v7</code>).</li>
+  <li><code>npm ci</code> – függőségek telepítése pontosan a lock fájl szerint.</li>
+  <li><code>npm run lint</code> – szintaxis-ellenőrzés.</li>
+  <li><code>npm test</code> – 17 unit és API teszt. Hiba esetén nem készül image.</li>
+</ol>
+<h3>6.2 Docker image build és publikálás</h3>
+<ol>
+  <li>Docker Buildx előkészítése, bejelentkezés a GHCR-be a beépített <code>GITHUB_TOKEN</code>-nel (nincs külön titok).</li>
+  <li>Multi-stage image build; a commit SHA az <code>APP_VERSION</code> build-argumentumon keresztül bekerül az image-be.</li>
+  <li>Push két címkével: <code>latest</code> és a commit SHA (visszakereshető, melyik commitból készült).</li>
+</ol>
+<h3>6.3 Deploy a sandboxba és smoke teszt</h3>
+<ol>
+  <li>A célkörnyezet (GitHub runner) a registry-ből lehúzza a <b>most elkészült</b> image-et (<code>:&lt;commit SHA&gt;</code>), és konténerként elindítja.</li>
+  <li>Várakozás, amíg a <code>/health</code> végpont válaszol (legfeljebb 40 mp; ha nem indul el, kiírja a konténer naplóját és hibával leáll).</li>
+  <li>Smoke teszt: <code>/health</code> állapota „ok” és a verzió megegyezik a commit SHA-val; a tabella tartalmazza a demócsapatokat; új csapat felvehető (<code>POST</code>); a webes felület kiszolgálódik.</li>
+  <li>Összefoglaló a futás oldalán: <code>Sikeres deploy: ghcr.io/pumca/cs2-esports-tracker:&lt;SHA&gt;</code>.</li>
+</ol>
+<pre>  deploy:
+    needs: docker
+    steps:
+      - uses: docker/login-action@v4      # bejelentkezés a GHCR-be
+      - run: |
+          docker pull "$IMAGE_LC:${{ github.sha }}"
+          docker run -d --name tracker -p 3000:3000 "$IMAGE_LC:${{ github.sha }}"
+      - run: |                             # smoke teszt
+          curl -fsS http://localhost:3000/health | grep '"status":"ok"'
+          curl -fsS http://localhost:3000/health | grep "${{ github.sha }}"
+          curl -fsS http://localhost:3000/api/standings | grep 'NAVI'
+          curl -fsS -X POST http://localhost:3000/api/teams ... | grep 'Smoke Team'
+          curl -fsS http://localhost:3000/ | grep 'CS2'</pre>
+
+<h2>7. Konténerizálás (Dockerfile)</h2>
+<ul>
+  <li><b>Multi-stage build:</b> az első fázis csak a futáshoz szükséges függőségeket telepíti (<code>npm ci --omit=dev</code>), a végső image csak a szükséges fájlokat tartalmazza (kis méret).</li>
+  <li><b>Biztonság:</b> a konténer nem root felhasználóval fut (<code>USER node</code>).</li>
+  <li><b>Önellenőrzés:</b> <code>HEALTHCHECK</code> a <code>/health</code> végpontra.</li>
+  <li><b>Verzió:</b> az <code>APP_VERSION</code> környezeti változó a commit SHA, ezt adja vissza a <code>/health</code>.</li>
+</ul>
+
+<h2>8. Tesztelés</h2>
+<table>
+  <tr><th style="width:32%">Tesztfájl</th><th>Mit ellenőriz</th></tr>
+  <tr><td><code>test/rules.test.js</code> (7)</td><td>Érvényes és érvénytelen pályaeredmények (rendes játékidő, hosszabbítás), BO3 kiértékelés, felesleges és hiányzó pálya, érvénytelen BO-érték</td></tr>
+  <tr><td><code>test/api.test.js</code> (10)</td><td><code>/health</code>; csapatfelvétel és duplikáció tiltása; meccsrögzítés és tabella; érvénytelen meccs elutasítása; logó és címer validálása; hibás JSON és ismeretlen végpont; statisztikák; törlés; tabella-sorrend</td></tr>
+  <tr><td>Smoke teszt (pipeline)</td><td>A telepített konténeren: állapot, verzió, tabella, csapatfelvétel, felület</td></tr>
+</table>
+<p>A teszteket a pipeline minden futáskor lefuttatja; helyben az <code>npm test</code> paranccsal indíthatók (eredmény: 17/17 sikeres).</p>
+
+<h2 class="page-break">9. Definition of Done – igazolás</h2>
+<div class="box">„A projekt akkor tekinthető késznek, ha a folyamat végén létrejövő és telepítésre kerülő artifact sikeresen elindul a célkörnyezetben, és elérhetővé teszi az üzleti funkcióit.”</div>
+<ul>
+  <li><b>Artifact:</b> a <code>ghcr.io/pumca/cs2-esports-tracker:&lt;commit SHA&gt;</code> Docker image, amelyet a pipeline épít és publikál.</li>
+  <li><b>Telepítés a célkörnyezetbe:</b> a deploy job ezt az image-et húzza le a registry-ből, és konténerként elindítja.</li>
+  <li><b>Sikeres indulás:</b> a <code>/health</code> „ok” állapotot és a commit SHA-val egyező verziót ad – vagyis pontosan az új artifact fut.</li>
+  <li><b>Üzleti funkciók elérhetők:</b> a tabella lekérdezhető, új csapat felvehető, a webes felület betölt.</li>
+  <li><b>Igazolt futás:</b> <a href="https://github.com/pumca/cs2-esports-tracker/actions/runs/45485436506">github.com/pumca/cs2-esports-tracker/actions/runs/45485436506</a> – mindhárom job sikeres, teljes idő 1 perc 16 mp.</li>
+</ul>
+<figure><img src="screenshots/09-pipeline-futas.jpg" alt=""><figcaption>1. ábra – A pipeline futása a GitHub Actionsben: Build és teszt → Docker image → Deploy és smoke teszt, mind sikeres</figcaption></figure>
+<figure><img src="screenshots/11-build-teszt.jpg" alt=""><figcaption>2. ábra – A „Build és teszt” job lépései (checkout, Node 22, npm ci, lint, tesztek)</figcaption></figure>
+<figure><img src="screenshots/10-smoke-teszt.jpg" alt=""><figcaption>3. ábra – A smoke teszt kimenete: a <code>/health</code> a commit SHA-t adja vissza, a tabella a csapatokat</figcaption></figure>
+
+<h2>10. Futtatás és telepítés</h2>
+<h3>10.1 Automatikus (CI/CD)</h3>
+<pre>git add .
+git commit -m "változás leírása"
+git push            # a pipeline automatikusan elindul: build → teszt → image → deploy → smoke teszt</pre>
+<h3>10.2 Helyben</h3>
+<pre>start.bat                   # Windows: telepít, elindít, megnyitja a böngészőt
+npm install &amp;&amp; npm start     # http://localhost:3000
+npm test                    # tesztek
+docker compose up --build   # Dockerrel
+docker run -p 3000:3000 ghcr.io/pumca/cs2-esports-tracker:latest   # a publikált image</pre>
+
+<h2 class="page-break">11. Képernyőképek</h2>
+<figure><img src="screenshots/02-tabella.png" alt=""><figcaption>4. ábra – Tabella csapatlogókkal, pálya- és körkülönbséggel</figcaption></figure>
+<figure><img src="screenshots/03-meccsek.png" alt=""><figcaption>5. ábra – Meccsek: sorozateredmény, pályánkénti eredmények, keresés, törlés</figcaption></figure>
+<figure><img src="screenshots/05-uj-meccs.png" alt=""><figcaption>6. ábra – Új meccs rögzítése (BO1/BO3/BO5, pályaválasztás)</figcaption></figure>
+<figure><img src="screenshots/08-hibas-eredmeny.jpg" alt=""><figcaption>7. ábra – Érvénytelen CS2-eredmény (13-12) azonnali jelzése</figcaption></figure>
+<figure><img src="screenshots/04-csapatok.png" alt=""><figcaption>8. ábra – Csapatok: hivatalos logó vagy saját címer választása</figcaption></figure>
+<figure><img src="screenshots/06-vilagos-tema.png" alt=""><figcaption>9. ábra – Áttekintés világos témában</figcaption></figure>
+<figure class="narrow"><img src="screenshots/07-mobil.jpg" alt=""><figcaption>10. ábra – Mobilnézet</figcaption></figure>
+
+<h2>12. Továbbfejlesztési lehetőségek</h2>
+<ul>
+  <li>Tartós adatbázis (pl. PostgreSQL) a memóriabeli tár helyett.</li>
+  <li>Telepítés tartósan elérhető felhős környezetbe (pl. Azure, Render, Fly.io) a deploy jobból.</li>
+  <li>Kubernetes manifest, több környezet (staging / production) jóváhagyással.</li>
+  <li>Monitorozás (Prometheus, Grafana), automatikus verziózás (semantic release).</li>
+</ul>
+<p style="margin-top:18px;font-size:9pt;color:#5d6574">A csapatlogók (NAVI, FaZe Clan, G2 Esports, Team Vitality) az érintett szervezetek védjegyei; forrásuk a Wikimedia Commons / Wikipedia, a projektben kizárólag oktatási céllal szerepelnek.</p>
+</body>
+</html>

@@ -79,8 +79,16 @@ docker compose up --build # Dockerrel
 Tartós adatbázis (PostgreSQL), telepítés külső felhőbe (pl. Render/Fly.io/Azure) a deploy jobban, Kubernetes manifest, monitoring (Prometheus), automatikus verziózás (semantic release).
 
 ## 9. Élő repository és igazolt futás
-- Repository: https://github.com/pumca/cs2-esports-tracker (privát; az oktató hozzáférését a Settings → Collaborators menüben lehet megadni)
-- Első sikeres pipeline-futás: https://github.com/pumca/cs2-esports-tracker/actions/runs/45477854908
-  - Build és teszt: 16 mp · Docker image build és publikálás: 42 mp · Deploy és smoke teszt: 15 mp · összesen 1 p 20 mp
-  - A deploy job összefoglalója: `Sikeres deploy: ghcr.io/pumca/cs2-esports-tracker:<commit SHA>`
+- Repository (nyilvános): https://github.com/pumca/cs2-esports-tracker
+- Igazolt sikeres pipeline-futás: https://github.com/pumca/cs2-esports-tracker/actions/runs/45485436506
+  - Build és teszt → Docker image build és publikálás → Deploy és smoke teszt, mind sikeres, összesen 1 p 16 mp
+  - A smoke teszt kimenete: a `/health` a commit SHA-t adja vissza, a tabella lekérdezhető, új csapat felvehető
 - A futtatott image a GitHub Container Registry-ben: `ghcr.io/pumca/cs2-esports-tracker` (`latest` és commit SHA tag)
+
+## 10. Részletes dokumentáció és képernyőképek
+- A leadásra szánt, képernyőképekkel ellátott dokumentáció: [`docs/DOKUMENTACIO.pdf`](docs/DOKUMENTACIO.pdf) (forrása: `docs/dokumentacio.html`)
+- Képernyőképek: [`docs/screenshots/`](docs/screenshots/) – az alkalmazás oldalai, mobilnézet, hibajelzés, valamint a GitHub Actions futás, a build/teszt és a smoke teszt kimenete
+- Elevator pitch szó szerinti szövege és felvételi útmutató: [`ELEVATOR_PITCH.md`](ELEVATOR_PITCH.md)
+
+![Áttekintés](docs/screenshots/01-attekintes.png)
+![Pipeline futás](docs/screenshots/09-pipeline-futas.jpg)

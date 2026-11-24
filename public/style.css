@@ -90,7 +90,7 @@ tr.lead .rk { color: var(--gold); font-weight: 700; }
 .mapl { padding: 6px 16px 10px; }
 .mapl .row { display: grid; grid-template-columns: 90px 1fr 24px; gap: 12px; align-items: center; padding: 6px 0; font-size: 14px; }
 .track { height: 6px; background: var(--raise); border-radius: 1px; }
-.fill { height: 100%; width: 0; background: var(--ct); transition: width .7s ease-out; }
+.fill { height: 100%; background: var(--ct); transition: width .7s ease-out; }
 .fill.g { background: var(--gold); }
 
 /* csapatok */
@@ -176,4 +176,9 @@ img.emb.logo { object-fit: contain; background: #eef0f4; border-radius: 5px; pad
   #nav { gap: 0; } #nav a { padding: 10px 6px; font-size: 14px; }
   #nav a.cta { margin-left: 0; }
   .bar input#q { width: 100% !important; }
+}
+.page-head p { min-width: 0; }
+@media (max-width: 340px) {
+  .opt { display: none; }
+  .page-head p { flex: 1 1 100%; font-size: 14px; }
 }

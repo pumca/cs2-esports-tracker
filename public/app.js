@@ -72,13 +72,7 @@ function confirmBox(title, text) {
     $('#mo').onclick = () => { closeModal(); resolve(true); };
   });
 }
-function countUp(el, to) {
-  const dec = String(to).includes('.') ? 1 : 0, t0 = performance.now();
-  const step = (t) => { const p = Math.min(1, (t - t0) / 700); el.textContent = (to * (1 - (1 - p) ** 3)).toFixed(dec); if (p < 1) requestAnimationFrame(step); };
-  requestAnimationFrame(step);
-}
 const stagger = (root) => root.querySelectorAll('tbody tr, .mrow, .tc').forEach((el, i) => { el.style.animationDelay = Math.min(i, 12) * 35 + 'ms'; });
-const grow = (root) => requestAnimationFrame(() => requestAnimationFrame(() => root.querySelectorAll('[data-w]').forEach((el) => { el.style.width = el.dataset.w + '%'; })));
 
 async function refresh() {
   [state.teams, state.matches, state.standings, state.stats, state.logos] = await Promise.all([
@@ -125,10 +119,10 @@ function matchRow(m, deletable) {
   </div>`;
 }
 function standingsTable(rows, full) {
-  return `<table><thead><tr><th>#</th><th>Csapat</th><th class="r">M</th><th class="r">Gy</th><th class="r">V</th>${full ? '<th class="r">Pálya</th><th class="r">Kör</th>' : ''}<th class="r">Pont</th></tr></thead><tbody>
+  return `<table><thead><tr><th>#</th><th>Csapat</th><th class="r">M</th><th class="r">Gy</th><th class="r">V</th>${full ? '<th class="r opt">Pálya</th><th class="r opt">Kör</th>' : ''}<th class="r">Pont</th></tr></thead><tbody>
     ${rows.map((r) => `<tr class="${r.rank === 1 ? 'lead' : ''}"><td class="rk">${r.rank}</td><td><div class="tm">${emblem(teamOf(r.teamId), 24)}${esc(r.team)}</div></td>
       <td class="r">${r.played}</td><td class="r">${r.wins}</td><td class="r">${r.losses}</td>
-      ${full ? `<td class="r">${signed(r.mapsWon - r.mapsLost)}</td><td class="r">${signed(r.roundsWon - r.roundsLost)}</td>` : ''}
+      ${full ? `<td class="r opt">${signed(r.mapsWon - r.mapsLost)}</td><td class="r opt">${signed(r.roundsWon - r.roundsLost)}</td>` : ''}
       <td class="r pts">${r.points}</td></tr>`).join('')}</tbody></table>`;
 }
 const head = (t, p) => `<div class="page-head"><h1>${t}</h1><p>${p || ''}</p></div>`;
@@ -140,17 +134,16 @@ const views = {
     const hi = Math.max(1, ...state.standings.map((r) => r.points));
     el.innerHTML = `${head('Áttekintés', 'Aktuális szezon')}
     <div class="strip">${[[s.teams, 'csapat'], [s.matches, 'meccs'], [s.maps, 'lejátszott pálya'], [s.avgRoundsPerMap, 'átlag kör / pálya'], [s.overtimes, 'hosszabbítás']]
-      .map(([n, l]) => `<div><div class="n" data-count="${n}">0</div><div class="l">${l}</div></div>`).join('')}</div>
+      .map(([n, l]) => `<div><div class="n">${n}</div><div class="l">${l}</div></div>`).join('')}</div>
     <div class="cols">
       <section class="panel"><header><h2>Tabella</h2><a href="#/standings">Részletek →</a></header>${state.standings.length ? standingsTable(state.standings, false) : '<div class="empty">Még nincs csapat</div>'}</section>
       <section class="panel"><header><h2>Legutóbbi meccsek</h2><a href="#/matches">Összes →</a></header>${state.matches.slice(-4).reverse().map((m) => matchRow(m, false)).join('') || '<div class="empty">Még nincs meccs</div>'}</section>
     </div>
     <div class="cols eq">
-      <section class="panel"><header><h2>Pontok</h2></header><div class="mapl">${state.standings.map((r) => `<div class="row"><span>${esc(r.team)}</span><div class="track"><div class="fill g" data-w="${r.points / hi * 100}"></div></div><b>${r.points}</b></div>`).join('')}</div></section>
-      <section class="panel"><header><h2>Játszott pályák</h2></header><div class="mapl">${s.mapPopularity.map((m) => `<div class="row"><span>${esc(m.map)}</span><div class="track"><div class="fill" data-w="${m.count / mx * 100}"></div></div><b>${m.count}</b></div>`).join('') || '<div class="empty">Még nincs adat</div>'}</div></section>
+      <section class="panel"><header><h2>Pontok</h2></header><div class="mapl">${state.standings.map((r) => `<div class="row"><span>${esc(r.team)}</span><div class="track"><div class="fill g" style="width:${r.points / hi * 100}%"></div></div><b>${r.points}</b></div>`).join('')}</div></section>
+      <section class="panel"><header><h2>Játszott pályák</h2></header><div class="mapl">${s.mapPopularity.map((m) => `<div class="row"><span>${esc(m.map)}</span><div class="track"><div class="fill" style="width:${m.count / mx * 100}%"></div></div><b>${m.count}</b></div>`).join('') || '<div class="empty">Még nincs adat</div>'}</div></section>
     </div>`;
-    el.querySelectorAll('[data-count]').forEach((n) => countUp(n, Number(n.dataset.count)));
-    stagger(el); grow(el);
+    stagger(el);
   },
 
   standings(el) {
@@ -272,7 +265,8 @@ $('#theme').onclick = () => {
   const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
   document.documentElement.dataset.theme = next; localStorage.setItem('theme', next);
 };
-document.documentElement.dataset.theme = localStorage.getItem('theme') || 'dark';
+const urlTheme = new URLSearchParams(location.search).get('theme');
+document.documentElement.dataset.theme = ['dark', 'light'].includes(urlTheme) ? urlTheme : (localStorage.getItem('theme') || 'dark');
 window.addEventListener('hashchange', go);
 fetch('/health').then((r) => r.json()).then((h) => { $('#ver').textContent = 'v' + String(h.version).slice(0, 7); }).catch(() => {});
 go();
